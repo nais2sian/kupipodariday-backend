@@ -49,8 +49,14 @@ export class WishesService extends BaseCrudService<Wish> {
       relations: ['owner'],
     });
     if (!original) throw new NotFoundException('Wish not found');
+    const data: Partial<Wish> = { ...original };
 
-    const { ...data } = original;
+    delete data.id;
+    delete data.owner;
+    delete data.raised;
+    delete data.copied;
+    delete data.createdAt;
+    delete data.updatedAt;
 
     const clone = this.repo.create({
       ...data,
@@ -58,9 +64,9 @@ export class WishesService extends BaseCrudService<Wish> {
       raised: 0,
       copied: 0,
     });
-    const savedClone = await this.repo.save(clone);
-
+    const savedClone = await this.repo.save(clone); // → INSERT
     await this.repo.increment({ id: wishId }, 'copied', 1);
+
     return savedClone;
   }
 
