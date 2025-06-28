@@ -33,6 +33,7 @@ lerna-debug.log*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+<<<<<<< HEAD
 !.vscode/extensions.json
 
 # dotenv environment variable files
@@ -54,3 +55,6 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+=======
+!.vscode/extensions.json
+>>>>>>> 56e31ea10808d09ba75bf541023a4a192f4eeecc
