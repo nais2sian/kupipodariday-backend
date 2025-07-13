@@ -9,9 +9,10 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://167.235.140.175:3000'],
+    origin: ['https://nais2sian.github.io', 'http://localhost:3000'],
     methods: 'GET,POST,PATCH,DELETE',
     credentials: true,
+    allowedHeaders: 'Content-Type,Authorization',
   });
 
   const port = process.env.PORT || 3001;
