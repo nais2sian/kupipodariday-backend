@@ -23,42 +23,23 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const isProd = config.get('NODE_ENV') === 'production';
-        const url = config.get<string>('SUPABASE_DB_URL');
-
-        if (url) {
-          return {
-            type: 'postgres',
-            url,
-            ssl: { rejectUnauthorized: false },
-            autoLoadEntities: true,
-            synchronize: config.get('NODE_ENV') !== 'production',
-            migrationsRun: true,
-            logging:
-              config.get('NODE_ENV') !== 'production'
-                ? ['query', 'error']
-                : false,
-          };
+      useFactory: (cfg: ConfigService) => {
+        const url = cfg.get<string>('SUPABASE_DB_URL');
+        if (!url) {
+          throw new Error('SUPABASE_DB_URL is not defined');
         }
+
+        const isProd = cfg.get('NODE_ENV') === 'production';
 
         return {
           type: 'postgres',
-          host: config.get<string>('DB_HOST', 'localhost'),
-          port: Number(config.get<string>('DB_PORT', '5432')),
-          username: config.get<string>('DB_USERNAME'),
-          password: config.get<string>('DB_PASSWORD'),
-          database: config.get<string>('DB_DATABASE'),
-          ssl:
-            config.get('DB_SSL') === 'true'
-              ? { rejectUnauthorized: false }
-              : false,
+          url,
+          ssl: { rejectUnauthorized: false },
           autoLoadEntities: true,
           synchronize: !isProd,
           migrationsRun: true,
-          logging: !isProd ? ['query', 'error'] : false,
+          logging: isProd ? false : ['query', 'error'],
         };
       },
     }),
