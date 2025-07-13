@@ -17,7 +17,10 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.testing', '.env.development', '.env'],
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? []
+          : ['.env.testing', '.env.development', '.env'],
     }),
 
     TypeOrmModule.forRootAsync({
