@@ -12,13 +12,6 @@ import { OffersModule } from './offers/offers.module';
 import { HashModule } from './hash/hash.module';
 import { AuthModule } from './auth/auth.module';
 
-console.log(' ENV DEBUG', {
-  NODE_ENV: process.env.NODE_ENV,
-  SUPABASE_DB_URL: process.env.SUPABASE_DB_URL?.slice(0, 60),
-  DB_HOST: process.env.DB_HOST,
-  DB_PORT: process.env.DB_PORT,
-});
-
 @Module({
   imports: [
     ConfigModule.forRoot({
