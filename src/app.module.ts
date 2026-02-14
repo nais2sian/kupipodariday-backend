@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm';
+import type { LoggerOptions } from 'typeorm';
+import type { TlsOptions } from 'tls';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -24,22 +26,29 @@ import { AuthModule } from './auth/auth.module';
 
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (cfg: ConfigService) => {
-        const url = cfg.get<string>('SUPABASE_DB_URL');
+      useFactory: (cfg: ConfigService): TypeOrmModuleOptions => {
+        const url = cfg.get<string>('DATABASE_URL');
         if (!url) {
-          throw new Error('SUPABASE_DB_URL is not defined');
+          throw new Error('DATABASE_URL is not defined');
         }
 
-        const isProd = cfg.get('NODE_ENV') === 'production';
+        const nodeEnv = cfg.get<string>('NODE_ENV') ?? 'development';
+        const isProd = nodeEnv === 'production';
+
+        const ssl: boolean | TlsOptions = isProd
+          ? { rejectUnauthorized: false }
+          : false;
+
+        const logging: LoggerOptions = isProd ? false : ['query', 'error'];
 
         return {
           type: 'postgres',
           url,
-          ssl: { rejectUnauthorized: false },
+          ssl,
           autoLoadEntities: true,
           synchronize: !isProd,
           migrationsRun: true,
-          logging: isProd ? false : ['query', 'error'],
+          logging,
         };
       },
     }),
@@ -51,7 +60,6 @@ import { AuthModule } from './auth/auth.module';
     HashModule,
     AuthModule,
   ],
-
   controllers: [AppController],
   providers: [AppService],
 })
