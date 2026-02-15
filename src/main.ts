@@ -8,14 +8,19 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
+  const allowedOrigins = (process.env.CORS_ORIGINS ?? 'http://localhost:3000')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
   app.enableCors({
-    origin: ['https://nais2sian.github.io', 'http://localhost:3000'],
-    methods: 'GET,POST,PATCH,DELETE',
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: 'Content-Type,Authorization',
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  const port = process.env.PORT || 3001;
+  const port = Number(process.env.PORT) || 3001;
   await app.listen(port, '0.0.0.0');
 }
 void bootstrap();
